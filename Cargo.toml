@@ -1,0 +1,19 @@
+[package]
+name = "collection-traits"
+version = "0.1.0"
+authors = ["Alisher Galiev <alishergaliev88@gmail.com>"]
+description = "Traits to abstract away from different types of collections/containers"
+edition = "2021"
+license = "Apache-2.0"
+repository = "https://github.com/JustForFun88/collections"
+keywords = ["traits", "abstract"]
+categories = ["rust-patterns"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+hashbrown = "0.13.2"
+im = "15.1.0"
+indexmap = "1.9.2"
+itertools = "0.10.5"
+smallvec = "1.10.0"
