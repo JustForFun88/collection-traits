@@ -14,8 +14,9 @@ use std::collections::{
 /// A trait that allows you to abstract from various types of collections /
 /// containers that can have some key and value stored inside.
 ///
-/// Provides a basic API that allows you to work with both the owning or
-/// reference variable.
+/// Provides a basic API that allows you to work with a variable that owns
+/// a collection or array of collections, as well as a variable that references
+/// to a collection or array of collections.
 ///
 /// # Note
 ///

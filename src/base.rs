@@ -12,7 +12,8 @@ use std::collections::{self, btree_map, hash_map, linked_list, vec_deque};
 /// A trait that allows you to abstract from various types of collections /
 /// containers that can have some key and value stored inside.
 ///
-/// Provides a basic API that allows you to change the values of a collection.
+/// Provides a basic API that allows you to change the values of a collection
+/// or array of collections.
 ///
 /// # Note
 ///

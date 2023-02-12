@@ -27,7 +27,7 @@ pub use im_iters::{
 };
 
 mod map;
-pub use map::{MapContainer, MapCollectionMut, MapCollectionRef};
+pub use map::{MapCollection, MapCollectionMut, MapCollectionRef};
 
 mod set;
 pub use set::{SetContainer, SetContainerMut, SetContainerRef};
