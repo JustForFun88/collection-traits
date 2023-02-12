@@ -54,22 +54,22 @@ mod private_map_collections {
 ///
 /// To prevent this invariant from being violated, the implementation of
 /// this trait outside of this crate is prohibited.
-///
-/// # Notes about the implementation of the trait within this crate
-///
-/// When implementing this trait, you need to be careful about the type `E`
-/// of the  lookup key. For greater flexibility, there are no restrictions
-/// on the type of search key, but one of two conditions must be met:
-///
-/// 1. If it is possible to implement it, then it is desirable to specify
-///    the condition `E: Equivalent<Self::Key>`.
-/// 2. If the first condition cannot be met (e.g. for [`std::collections::HashMap`]),
-///    the key **must be** any borrowed form of the container's key type (i.e.
-///    `Self::Key: Borrow<E>` ) .
-///
-/// Note that a container that implements `E: Equivalent<Self::Key>` will also
-/// accept all `E` lookup keys such as `Self::Key: Borrow<E>`, but the reverse
-/// is not true.
+//
+// # Notes about the implementation of the trait within this crate
+//
+// When implementing this trait, you need to be careful about the type `E`
+// of the  lookup key. For greater flexibility, there are no restrictions
+// on the type of search key, but one of two conditions must be met:
+//
+// 1. If it is possible to implement it, then it is desirable to specify
+//    the condition `E: Equivalent<Self::Key>`.
+// 2. If the first condition cannot be met (e.g. for [`std::collections::HashMap`]),
+//    the key **must be** any borrowed form of the container's key type (i.e.
+//    `Self::Key: Borrow<E>` ) .
+//
+// Note that a container that implements `E: Equivalent<Self::Key>` will also
+// accept all `E` lookup keys such as `Self::Key: Borrow<E>`, but the reverse
+// is not true.
 pub trait MapCollectionRef<E = <Self as KeyContain>::Key>
 where
     Self: AnyCollectionRef<E> + Sized + private_map_collections::Sealed,
@@ -121,7 +121,7 @@ where
     /// repeat within the container.
     ///
     /// The lookup key `E` must be either a borrowed form of the container's
-    /// key type (ie `Self::Key: Borrow<E>`) or, if implemented for this
+    /// key type (i.e. `Self::Key: Borrow<E>`) or, if implemented for this
     /// container, `E: Equivalent<Self::Key>`.
     ///
     /// Note that a container that implements `E: Equivalent<Self::Key>` will
@@ -183,6 +183,7 @@ where
     /// ```
     /// use collection_traits::MapCollectionRef;
     /// use hashbrown::HashMap;
+    /// use std::collections::BTreeMap;
     ///
     /// let map1: HashMap<i32, i32> = HashMap::from([(1, 10), (2, 20), (3, 30)]);
     ///
@@ -192,7 +193,7 @@ where
     /// values.sort_unstable();
     /// assert_eq!(values, [(&1, &10), (&2, &20), (&3, &30)]);
     ///
-    /// let map2: HashMap<i32, i32> = HashMap::from([(4, 40), (5, 50), (6, 60)]);
+    /// let map2: BTreeMap<i32, i32> = BTreeMap::from([(4, 40), (5, 50), (6, 60)]);
     ///
     /// // But you do not need to specify the type E when using MapCollectionRef
     /// // as trait bound
