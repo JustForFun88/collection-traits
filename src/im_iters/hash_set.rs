@@ -127,7 +127,9 @@ impl<T: Hash + Eq + Clone, S: BuildHasher> ImHashSymmetricDifference<'_, T, S> {
         Q: ?Sized + Hash + Eq,
     {
         ImHashSymmetricDifference {
-            iter: set.collection_difference(other).chain(other.collection_difference(set)),
+            iter: set
+                .collection_difference(other)
+                .chain(other.collection_difference(set)),
         }
     }
 }

@@ -30,10 +30,10 @@ mod map;
 pub use map::{MapCollection, MapCollectionMut, MapCollectionRef};
 
 mod set;
-pub use set::{SetContainer, SetCollectionMut, SetCollectionRef};
+pub use set::{SetCollection, SetCollectionMut, SetCollectionRef};
 
 mod vec;
-pub use vec::{VecContainer, VecContainerMut, VecContainerRef};
+pub use vec::{VecCollection, VecCollectionMut, VecCollectionRef};
 
 /// Key equivalence trait.
 ///

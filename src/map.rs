@@ -10,11 +10,11 @@ pub use self::map_ref::MapCollectionRef;
 mod map_mut;
 pub use self::map_mut::MapCollectionMut;
 
-/// A trait that allows you to abstract from various types of map collections
-/// (associative arrays).
-/// 
-/// Provides an API that allows you to convert a `MapCollection` to a consuming
-/// iterator.
+/// A trait that allows you to abstract from various types of map
+/// collections (associative arrays).
+///
+/// Provides an API that allows you to convert a `MapCollection`
+/// to a consuming iterator.
 ///
 /// # Note
 ///
