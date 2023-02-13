@@ -4,14 +4,14 @@ use core::hash::{BuildHasher, Hash};
 use std::collections::{self, btree_set, hash_set};
 
 mod set_ref;
-pub use set_ref::SetContainerRef;
+pub use set_ref::SetCollectionRef;
 
 mod set_mut;
-pub use set_mut::SetContainerMut;
+pub use set_mut::SetCollectionMut;
 
 pub trait SetContainer<E = <Self as ValueContain>::Value>
 where
-    Self: ValueCollectionRef<E> + SetContainerRef<E> + SetContainerMut<E>,
+    Self: ValueCollectionRef<E> + SetCollectionRef<E> + SetCollectionMut<E>,
     E: ?Sized,
 {
     type IntoValues: Iterator<Item = Self::Value>;

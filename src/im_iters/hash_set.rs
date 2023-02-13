@@ -1,4 +1,4 @@
-use crate::SetContainerRef;
+use crate::SetCollectionRef;
 use core::borrow::Borrow;
 use core::hash::{BuildHasher, Hash};
 use im::HashSet;
@@ -127,7 +127,7 @@ impl<T: Hash + Eq + Clone, S: BuildHasher> ImHashSymmetricDifference<'_, T, S> {
         Q: ?Sized + Hash + Eq,
     {
         ImHashSymmetricDifference {
-            iter: set.cont_difference(other).chain(other.cont_difference(set)),
+            iter: set.collection_difference(other).chain(other.collection_difference(set)),
         }
     }
 }

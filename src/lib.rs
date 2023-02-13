@@ -30,7 +30,7 @@ mod map;
 pub use map::{MapCollection, MapCollectionMut, MapCollectionRef};
 
 mod set;
-pub use set::{SetContainer, SetContainerMut, SetContainerRef};
+pub use set::{SetContainer, SetCollectionMut, SetCollectionRef};
 
 mod vec;
 pub use vec::{VecContainer, VecContainerMut, VecContainerRef};
