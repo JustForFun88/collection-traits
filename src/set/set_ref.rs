@@ -57,17 +57,17 @@ mod private_set_containers {
 // # Notes about the implementation of the trait within this crate
 //
 // When implementing this trait, you need to be careful about the type `E`
-// of the  lookup key. For greater flexibility, there are no restrictions
-// on the type of search key, but one of two conditions must be met:
+// of the  lookup value. For greater flexibility, there are no restrictions
+// on the type of search value, but one of two conditions must be met:
 //
 // 1. If it is possible to implement it, then it is desirable to specify
 //    the condition `E: Equivalent<Self::Value>`.
 // 2. If the first condition cannot be met (e.g. for [`std::collections::HashSet`]),
-//    the key **must be** any borrowed form of the container's key type (i.e.
+//    the value **must be** any borrowed form of the container's value type (i.e.
 //    `Self::Value: Borrow<E>` ) .
 //
 // Note that a container that implements `E: Equivalent<Self::Value>` will also
-// accept all `E` lookup keys such as `Self::Value: Borrow<E>`, but the reverse
+// accept all `E` lookup values such as `Self::Value: Borrow<E>`, but the reverse
 // is not true.
 pub trait SetCollectionRef<E = <Self as ValueContain>::Value>
 where

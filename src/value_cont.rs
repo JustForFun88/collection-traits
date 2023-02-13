@@ -25,17 +25,17 @@ use std::collections::{self, binary_heap, btree_set, hash_set, linked_list, vec_
 /// of containers `[T; N]` where `T: ValueContainerRef`.
 ///
 /// When implementing this trait, you need to be careful about the type `E`
-/// of the  lookup key. For greater flexibility, there are no restrictions
-/// on the type of search key, but one of two conditions must be met:
+/// of the  lookup value. For greater flexibility, there are no restrictions
+/// on the type of search value, but one of two conditions must be met:
 ///
 /// 1. If it is possible to implement it, then it is desirable to specify
 ///    the condition `E: Equivalent<Self::Value>`.
 /// 2. If the first condition cannot be met (e.g. for [`std::collections::HashSet`]),
-///    the key **must be** any borrowed form of the container's key type (i.e.
+///    the value **must be** any borrowed form of the container's value type (i.e.
 ///    `Self::Value: Borrow<E>` ) .
 ///
 /// Note that a container that implements `E: Equivalent<Self::Value>` will also
-/// accept all `E` lookup keys such as `Self::Value: Borrow<E>`, but the reverse
+/// accept all `E` lookup values such as `Self::Value: Borrow<E>`, but the reverse
 /// is not true.
 pub trait ValueCollectionRef<E = <Self as ValueContain>::Value>
 where
@@ -155,19 +155,19 @@ where
     fn is_collection_empty(&self) -> bool;
 
     /// Returns `true` if the container contains a value for the
-    /// specified key.
+    /// specified value.
     ///
     /// # Note
     ///
     /// Note that this trait does not guarantee that the returned value is
     /// unique and does not repeat within the container.
     ///
-    /// The lookup key `E` must be either a borrowed form of the container's
-    /// key type (ie `Self::Value: Borrow<E>`) or, if implemented for this
+    /// The lookup value `E` must be either a borrowed form of the container's
+    /// value type (ie `Self::Value: Borrow<E>`) or, if implemented for this
     /// container, `E: Equivalent<Self::Value>`.
     ///
     /// Note that a container that implements `E: Equivalent<Self::Value>` will
-    /// also accept all `E` lookup keys such as `Self::Value: Borrow<E>`, but
+    /// also accept all `E` lookup values such as `Self::Value: Borrow<E>`, but
     /// the converse is not true.
     ///
     /// # Examples
@@ -186,19 +186,19 @@ where
     ///
     /// // Also, there is no need to specify the type E when using ValueCollectionRef
     /// // as a trait bound (although specifying it will give more flexibility).
-    /// fn contain_value<T>(cont: &T, key: &T::Value) -> bool
+    /// fn contain_value<T>(cont: &T, value: &T::Value) -> bool
     /// where
     ///     T: ValueCollectionRef + ?Sized,
     /// {
-    ///     cont.contains_eq(key)
+    ///     cont.contains_eq(value)
     /// }
     ///
-    /// fn contain_borrow_value<T, Q: ?Sized>(cont: &T, key: &Q) -> bool
+    /// fn contain_borrow_value<T, Q: ?Sized>(cont: &T, value: &Q) -> bool
     /// where
     ///     T: ValueCollectionRef<Q> + ?Sized,
     ///     T::Value: Borrow<Q>,
     /// {
-    ///     cont.contains_eq(key)
+    ///     cont.contains_eq(value)
     /// }
     ///
     /// assert!(contain_value(&map1, &"a".to_string()));
@@ -216,21 +216,22 @@ where
     /// assert!(contain_borrow_value(&arr, &"5".to_string()));
     /// assert!(contain_borrow_value(&arr, "8"));
     /// ```    
-    fn contains_eq(&self, key: &E) -> bool;
+    fn contains_eq(&self, value: &E) -> bool;
 
-    /// Returns a reference to the value corresponding to the key.
+    /// Returns a reference to the value in the collection, if any, that
+    /// is equal to the given value.
     ///
     /// # Note
     ///
     /// Note that this trait does not guarantee that the returned value is
     /// unique and does not repeat within the container.
     ///
-    /// The lookup key `E` must be either a borrowed form of the container's
-    /// key type (ie `Self::Value: Borrow<E>`) or, if implemented for this
+    /// The lookup value `E` must be either a borrowed form of the container's
+    /// value type (ie `Self::Value: Borrow<E>`) or, if implemented for this
     /// container, `E: Equivalent<Self::Value>`.
     ///
     /// Note that a container that implements `E: Equivalent<Self::Value>` will
-    /// also accept all `E` lookup keys such as `Self::Value: Borrow<E>`, but
+    /// also accept all `E` lookup values such as `Self::Value: Borrow<E>`, but
     /// the converse is not true.
     ///
     /// # Examples
@@ -249,26 +250,26 @@ where
     ///
     /// // Also, there is no need to specify the type E when using ValueCollectionRef
     /// // as a trait bound (although specifying it will give more flexibility).
-    /// fn get_value<'a, 'b, T>(cont: &'a T, key: &'b T::Value) -> Option<&'a T::Value>
+    /// fn get_value<'a, 'b, T>(cont: &'a T, value: &'b T::Value) -> Option<&'a T::Value>
     /// where
     ///     T: ValueCollectionRef + ?Sized,
     /// {
-    ///     cont.get_value(key)
+    ///     cont.get_value(value)
     /// }
     ///
-    /// fn get_value_borrow_key<'a, 'b, T, Q: ?Sized>(cont: &'a T, key: &'b Q) -> Option<&'a T::Value>
+    /// fn get_value_borrow_value<'a, 'b, T, Q: ?Sized>(cont: &'a T, value: &'b Q) -> Option<&'a T::Value>
     /// where
     ///     T: ValueCollectionRef<Q> + ?Sized,
     ///     T::Value: Borrow<Q>,
     /// {
-    ///     cont.get_value(key)
+    ///     cont.get_value(value)
     /// }
     ///
     /// assert_eq!(get_value(&map1, &"a".to_string()), Some(&"a".to_string()));
     /// // assert_eq!(get_value(&map1, "a"), Some(&1)); // Err: expected struct `String`, found `str`
     ///
-    /// assert_eq!(get_value_borrow_key(&map1, &"a".to_string()), Some(&"a".to_string()));
-    /// assert_eq!(get_value_borrow_key(&map1, "a"), Some(&"a".to_string()));
+    /// assert_eq!(get_value_borrow_value(&map1, &"a".to_string()), Some(&"a".to_string()));
+    /// assert_eq!(get_value_borrow_value(&map1, "a"), Some(&"a".to_string()));
     ///
     /// let arr = (0..3)
     ///     .map(|i| ((i * 3)..((i + 1) * 3)).map(|x| x.to_string()))
@@ -276,24 +277,25 @@ where
     ///     .unwrap();
     ///
     /// assert_eq!(get_value(&arr, &"1".to_string()), Some(&"1".to_owned()));
-    /// assert_eq!(get_value_borrow_key(&arr, &"5".to_string()), Some(&"5".to_owned()));
-    /// assert_eq!(get_value_borrow_key(&arr, "8"), Some(&"8".to_owned()));
+    /// assert_eq!(get_value_borrow_value(&arr, &"5".to_string()), Some(&"5".to_owned()));
+    /// assert_eq!(get_value_borrow_value(&arr, "8"), Some(&"8".to_owned()));
     /// ```    
-    fn get_value(&self, key: &E) -> Option<&Self::Value>;
+    fn get_value(&self, value: &E) -> Option<&Self::Value>;
 
-    /// Returns a converted value corresponding to the given key.
+    /// Returns a converted value of the collection, if any, that is
+    /// equal to the given value.
     ///
     /// # Note
     ///
     /// Note that this trait does not guarantee that the returned value is
     /// unique and does not repeat within the container.
     ///
-    /// The lookup key `E` must be either a borrowed form of the container's
-    /// key type (ie `Self::Value: Borrow<E>`) or, if implemented for this
+    /// The lookup value `E` must be either a borrowed form of the container's
+    /// value type (ie `Self::Value: Borrow<E>`) or, if implemented for this
     /// container, `E: Equivalent<Self::Value>`.
     ///
     /// Note that a container that implements `E: Equivalent<Self::Value>` will
-    /// also accept all `E` lookup keys such as `Self::Value: Borrow<E>`, but
+    /// also accept all `E` lookup values such as `Self::Value: Borrow<E>`, but
     /// the converse is not true.
     ///
     /// # Examples
@@ -316,17 +318,16 @@ where
     /// assert_eq!(arr.get_converted::<Cow<_>>("b"), Some(Cow::from("b")));
     /// assert_eq!(arr.get_converted::<Cow<_>>("c"), None);
     ///
-    /// // When key and value are the same
     /// let vec = vec!["a".to_owned(), "b".into(), "c".into()];
     /// assert_eq!(vec.get_converted::<Cow<_>>("a"), Some(Cow::from("a")));
     /// ```
-    fn get_converted<'a, 'b, FV>(&'a self, key: &E) -> Option<FV>
+    fn get_converted<'a, 'b, FV>(&'a self, value: &E) -> Option<FV>
     where
         FV: From<&'b Self::Value>,
         Self::Value: 'b,
         'a: 'b,
     {
-        if let Some(value) = self.get_value(key) {
+        if let Some(value) = self.get_value(value) {
             return Some(value.into());
         }
         None
@@ -338,7 +339,7 @@ where
     /// # Note
     ///
     /// The implementation of the iterator depends on the container type,
-    /// so iteration over the keys can take as `O(capacity)` so as `O(len)`
+    /// so iteration over the values can take as `O(capacity)` so as `O(len)`
     /// time.
     ///
     /// # Examples
@@ -402,13 +403,13 @@ where
     }
 
     #[inline]
-    fn contains_eq(&self, key: &E) -> bool {
-        <T as ValueCollectionRef<E>>::contains_eq(self, key)
+    fn contains_eq(&self, value: &E) -> bool {
+        <T as ValueCollectionRef<E>>::contains_eq(self, value)
     }
 
     #[inline]
-    fn get_value(&self, key: &E) -> Option<&Self::Value> {
-        <T as ValueCollectionRef<E>>::get_value(self, key)
+    fn get_value(&self, value: &E) -> Option<&Self::Value> {
+        <T as ValueCollectionRef<E>>::get_value(self, value)
     }
 
     #[inline]
@@ -437,13 +438,13 @@ where
     }
 
     #[inline]
-    fn contains_eq(&self, key: &E) -> bool {
-        <T as ValueCollectionRef<E>>::contains_eq(self, key)
+    fn contains_eq(&self, value: &E) -> bool {
+        <T as ValueCollectionRef<E>>::contains_eq(self, value)
     }
 
     #[inline]
-    fn get_value(&self, key: &E) -> Option<&Self::Value> {
-        <T as ValueCollectionRef<E>>::get_value(self, key)
+    fn get_value(&self, value: &E) -> Option<&Self::Value> {
+        <T as ValueCollectionRef<E>>::get_value(self, value)
     }
 
     #[inline]
@@ -453,8 +454,8 @@ where
 }
 
 macro_rules! impl_value_container_ref_for_vec_type {
-    (impl for $type_n:ty, T $(: $bound:ident)?, Value = $key:ty,
-        Value = $value:ty, Iters = $iter:ty) => (
+    (impl for $type_n:ty, T $(: $bound:ident)?, Value = $value:ty,
+        Iters = $iter:ty) => (
             impl<T, E> ValueCollectionRef<E> for $type_n
             where
                 $(T: $bound,)?
@@ -473,13 +474,13 @@ macro_rules! impl_value_container_ref_for_vec_type {
                 }
 
                 #[inline]
-                fn contains_eq(&self, key: &E) -> bool {
-                    self.iter().any(|x| Equivalent::equivalent(key, x))
+                fn contains_eq(&self, value: &E) -> bool {
+                    self.iter().any(|x| Equivalent::equivalent(value, x))
                 }
 
                 #[inline]
-                fn get_value(&self, key: &E) -> Option<&Self::Value> {
-                    self.iter().find(|x| Equivalent::equivalent(key, *x))
+                fn get_value(&self, value: &E) -> Option<&Self::Value> {
+                    self.iter().find(|x| Equivalent::equivalent(value, *x))
                 }
 
                 #[inline]
@@ -491,30 +492,30 @@ macro_rules! impl_value_container_ref_for_vec_type {
 }
 
 impl_value_container_ref_for_vec_type! {
-    impl for [T], T, Value = T, Value = T, Iters = core::slice::Iter<'a, T>
+    impl for [T], T, Value = T, Iters = core::slice::Iter<'a, T>
 }
 
 impl_value_container_ref_for_vec_type! {
-    impl for Vec<T>, T, Value = T, Value = T, Iters = core::slice::Iter<'a, T>
+    impl for Vec<T>, T, Value = T, Iters = core::slice::Iter<'a, T>
 }
 
 impl_value_container_ref_for_vec_type! {
-    impl for im::Vector<T>, T: Clone, Value = T, Value = T,
+    impl for im::Vector<T>, T: Clone, Value = T,
     Iters = im::vector::Iter<'a, T>
 }
 
 impl_value_container_ref_for_vec_type! {
-    impl for collections::VecDeque<T>, T, Value = T, Value = T,
+    impl for collections::VecDeque<T>, T, Value = T,
     Iters = vec_deque::Iter<'a, T>
 }
 
 impl_value_container_ref_for_vec_type! {
-    impl for collections::LinkedList<T>, T, Value = T, Value = T,
+    impl for collections::LinkedList<T>, T, Value = T,
     Iters = linked_list::Iter<'a, T>
 }
 
 impl_value_container_ref_for_vec_type! {
-    impl for collections::BinaryHeap<T>, T, Value = T, Value = T,
+    impl for collections::BinaryHeap<T>, T, Value = T,
     Iters = binary_heap::Iter<'a, T>
 }
 
@@ -536,13 +537,13 @@ where
     }
 
     #[inline]
-    fn contains_eq(&self, key: &E) -> bool {
-        self.iter().any(|x| Equivalent::equivalent(key, x))
+    fn contains_eq(&self, value: &E) -> bool {
+        self.iter().any(|x| Equivalent::equivalent(value, x))
     }
 
     #[inline]
-    fn get_value(&self, key: &E) -> Option<&Self::Value> {
-        self.iter().find(|x| Equivalent::equivalent(key, *x))
+    fn get_value(&self, value: &E) -> Option<&Self::Value> {
+        self.iter().find(|x| Equivalent::equivalent(value, *x))
     }
 
     #[inline]
@@ -572,8 +573,8 @@ where
         self.contains(eq)
     }
     #[inline]
-    fn get_value(&self, key: &Q) -> Option<&Self::Value> {
-        self.get(key)
+    fn get_value(&self, value: &Q) -> Option<&Self::Value> {
+        self.get(value)
     }
     #[inline]
     fn collection_values(&self) -> Self::Values<'_> {
@@ -602,8 +603,8 @@ where
         self.contains(eq)
     }
     #[inline]
-    fn get_value(&self, key: &Q) -> Option<&Self::Value> {
-        self.get(key)
+    fn get_value(&self, value: &Q) -> Option<&Self::Value> {
+        self.get(value)
     }
     #[inline]
     fn collection_values(&self) -> Self::Values<'_> {
@@ -632,8 +633,8 @@ where
         self.contains(eq)
     }
     #[inline]
-    fn get_value(&self, key: &Q) -> Option<&Self::Value> {
-        self.get(key)
+    fn get_value(&self, value: &Q) -> Option<&Self::Value> {
+        self.get(value)
     }
     #[inline]
     fn collection_values(&self) -> Self::Values<'_> {
@@ -658,14 +659,14 @@ where
         self.is_empty()
     }
     #[inline]
-    fn contains_eq(&self, key: &Q) -> bool {
-        self.contains(key)
+    fn contains_eq(&self, value: &Q) -> bool {
+        self.contains(value)
     }
 
     #[inline]
-    fn get_value(&self, key: &Q) -> Option<&Self::Value> {
-        if self.contains(key) {
-            return self.iter().find(|x| Equivalent::equivalent(key, *x));
+    fn get_value(&self, value: &Q) -> Option<&Self::Value> {
+        if self.contains(value) {
+            return self.iter().find(|x| Equivalent::equivalent(value, *x));
         }
         None
     }
@@ -696,8 +697,8 @@ where
         self.contains(eq)
     }
     #[inline]
-    fn get_value(&self, key: &Q) -> Option<&Self::Value> {
-        self.get(key)
+    fn get_value(&self, value: &Q) -> Option<&Self::Value> {
+        self.get(value)
     }
     #[inline]
     fn collection_values(&self) -> Self::Values<'_> {
@@ -721,14 +722,14 @@ where
         self.is_empty()
     }
     #[inline]
-    fn contains_eq(&self, key: &Q) -> bool {
-        self.contains(key)
+    fn contains_eq(&self, value: &Q) -> bool {
+        self.contains(value)
     }
 
     #[inline]
-    fn get_value(&self, key: &Q) -> Option<&Self::Value> {
-        if self.contains(key) {
-            return self.iter().find(|x| Equivalent::equivalent(key, *x));
+    fn get_value(&self, value: &Q) -> Option<&Self::Value> {
+        if self.contains(value) {
+            return self.iter().find(|x| Equivalent::equivalent(value, *x));
         }
         None
     }
@@ -760,14 +761,14 @@ where
     }
 
     #[inline]
-    fn contains_eq(&self, key: &E) -> bool {
-        self.iter().any(|x| x.contains_eq(key))
+    fn contains_eq(&self, value: &E) -> bool {
+        self.iter().any(|x| x.contains_eq(value))
     }
 
     #[inline]
-    fn get_value(&self, key: &E) -> Option<&Self::Value> {
-        if let Some(container) = self.iter().find(|x| x.contains_eq(key)) {
-            return container.get_value(key);
+    fn get_value(&self, value: &E) -> Option<&Self::Value> {
+        if let Some(container) = self.iter().find(|x| x.contains_eq(value)) {
+            return container.get_value(value);
         }
         None
     }

@@ -53,9 +53,9 @@ where
     ///
     /// It is created by the [`AnyCollectionRef::collection_keys()`].
     /// See its documentation for more.
-    /// 
+    ///
     /// # Note
-    /// 
+    ///
     /// This type can be the same type as [`AnyCollectionRef::Values<'a>`].
     type Keys<'a>: Iterator<Item = &'a Self::Key>
     where
@@ -64,12 +64,12 @@ where
 
     /// The type of the iterator visiting all values in arbitrary order.
     /// The iterator element type is `&'a Self::Value`.
-    /// 
+    ///
     /// It is created by the [`AnyCollectionRef::collection_values()`].
     /// See its documentation for more.
-    /// 
+    ///
     /// # Note
-    /// 
+    ///
     /// This type can be the same type as [`AnyCollectionRef::Keys<'a>`]
     type Values<'a>: Iterator<Item = &'a Self::Value>
     where

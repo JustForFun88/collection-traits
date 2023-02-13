@@ -94,7 +94,7 @@ where
     /// also accept all `E` lookup keys such as `Self::Key: Borrow<E>`, but
     /// the converse is not true.
     ///
-    /// Depending on the collection type, the `Self::key` collection may need to
+    /// Depending on the collection type, the `Self::Key` collection may need to
     /// implement the [`Hash`] and [`Eq`] or [`Ord`] traits. Thus, the corresponding
     /// search key `E` must also implement the corresponding traits.
     ///
@@ -211,7 +211,7 @@ where
     /// also accept all `E` lookup keys such as `Self::Key: Borrow<E>`, but
     /// the converse is not true.
     ///
-    /// Depending on the collection type, the `Self::key` collection may need to
+    /// Depending on the collection type, the `Self::Key` collection may need to
     /// implement the [`Hash`] and [`Eq`] or [`Ord`] traits. Thus, the corresponding
     /// search key `E` must also implement the corresponding traits.
     ///
@@ -292,7 +292,7 @@ where
     /// also accept all `E` lookup keys such as `Self::Key: Borrow<E>`, but
     /// the converse is not true.
     ///
-    /// Depending on the collection type, the `Self::key` collection may need to
+    /// Depending on the collection type, the `Self::Key` collection may need to
     /// implement the [`Hash`] and [`Eq`] or [`Ord`] traits. Thus, the corresponding
     /// search key `E` must also implement the corresponding traits.
     ///
