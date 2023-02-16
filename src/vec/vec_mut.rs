@@ -12,7 +12,70 @@ where
     where
         Self: 'a,
         Self::Value: 'a;
-    fn get_value_mut(&mut self, key: &E) -> Option<&mut Self::Value>;
+
+    /// Returns a mutable reference to the value in the collection, if any,
+    /// that is equal to the given value.
+    ///
+    /// # Note
+    ///
+    /// The lookup value `E` must be either a borrowed form of the container's
+    /// value type (ie `Self::Value: Borrow<E>`) or, if implemented for this
+    /// container, `E: Equivalent<Self::Value>`.
+    ///
+    /// Note that a container that implements `E: Equivalent<Self::Value>` will
+    /// also accept all `E` lookup values such as `Self::Value: Borrow<E>`, but
+    /// the converse is not true.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use collection_traits::VecCollectionMut;
+    /// use core::borrow::Borrow;
+    ///
+    /// let mut vec: Vec<String> = vec!["a".into(), "b".into()];
+    ///
+    /// // You do not need to specify the type E when calling this `VecCollectionMut`
+    /// // method directly.
+    /// let value = vec.get_value_mut("a").unwrap();
+    /// assert_eq!(value, &mut "a");
+    /// value.push_str(" char");
+    /// assert_eq!(vec.get_value_mut("a char"), Some(&mut "a char".to_owned()));
+    ///
+    /// // Also, there is no need to specify the type E when using VecCollectionMut
+    /// // as a trait bound (although specifying it will give more flexibility).
+    /// fn get_value_mut<'a, T>(cont: &'a mut T, key: &T::Value) -> Option<&'a mut T::Value>
+    /// where
+    ///     T: VecCollectionMut + ?Sized,
+    /// {
+    ///     cont.get_value_mut(key)
+    /// }
+    ///
+    /// fn get_value_mut_borrow_key<'a, T, Q>(cont: &'a mut T, key: &Q) -> Option<&'a mut T::Value>
+    /// where
+    ///     Q: ?Sized,
+    ///     T: VecCollectionMut<Q> + ?Sized,
+    ///     T::Value: Borrow<Q>,
+    /// {
+    ///     cont.get_value_mut(key)
+    /// }
+    ///
+    /// assert_eq!(
+    ///     get_value_mut(&mut vec, &"b".to_string()),
+    ///     Some(&mut "b".to_owned())
+    /// );
+    /// // Err: expected struct `String`, found `str`
+    /// // assert_eq!(get_value_mut(&mut vec, "a"), Some(&mut "b".to_owned()));
+    ///
+    /// assert_eq!(
+    ///     get_value_mut_borrow_key(&mut vec, &"b".to_string()),
+    ///     Some(&mut "b".to_owned())
+    /// );
+    /// assert_eq!(
+    ///     get_value_mut_borrow_key(&mut vec, "b"),
+    ///     Some(&mut "b".to_owned())
+    /// );
+    /// ```
+    fn get_value_mut(&mut self, value: &E) -> Option<&mut Self::Value>;
     fn get_value_mut_at(&mut self, index: usize) -> Option<&mut Self::Value>;
     fn collection_as_mut_slice(&mut self) -> Option<&mut [Self::Value]>;
     fn collection_append(&mut self, other: &mut Self);
@@ -27,6 +90,55 @@ where
     where
         F: FnMut(&Self::Value) -> bool;
     fn collection_values_mut(&mut self) -> Self::ValuesMut<'_>;
+}
+
+#[test]
+fn test() {
+    use crate::VecCollectionMut;
+    use core::borrow::Borrow;
+
+    let mut vec: Vec<String> = vec!["a".into(), "b".into()];
+
+    // You do not need to specify the type E when calling this `VecCollectionMut`
+    // method directly.
+    let value = vec.get_value_mut("a").unwrap();
+    assert_eq!(value, &mut "a");
+    value.push_str(" char");
+    assert_eq!(vec.get_value_mut("a char"), Some(&mut "a char".to_owned()));
+
+    // Also, there is no need to specify the type E when using VecCollectionMut
+    // as a trait bound (although specifying it will give more flexibility).
+    fn get_value_mut<'a, T>(cont: &'a mut T, key: &T::Value) -> Option<&'a mut T::Value>
+    where
+        T: VecCollectionMut + ?Sized,
+    {
+        cont.get_value_mut(key)
+    }
+
+    fn get_value_mut_borrow_key<'a, T, Q>(cont: &'a mut T, key: &Q) -> Option<&'a mut T::Value>
+    where
+        Q: ?Sized,
+        T: VecCollectionMut<Q> + ?Sized,
+        T::Value: Borrow<Q>,
+    {
+        cont.get_value_mut(key)
+    }
+
+    assert_eq!(
+        get_value_mut(&mut vec, &"b".to_string()),
+        Some(&mut "b".to_owned())
+    );
+    // Err: expected struct `String`, found `str`
+    // assert_eq!(get_value_mut(&mut vec, "a"), Some(&mut "b".to_owned()));
+
+    assert_eq!(
+        get_value_mut_borrow_key(&mut vec, &"b".to_string()),
+        Some(&mut "b".to_owned())
+    );
+    assert_eq!(
+        get_value_mut_borrow_key(&mut vec, "b"),
+        Some(&mut "b".to_owned())
+    );
 }
 
 impl<T, E: ?Sized> VecCollectionMut<E> for &mut T
@@ -97,8 +209,8 @@ where
     }
 
     #[inline]
-    fn get_value_mut(&mut self, key: &E) -> Option<&mut Self::Value> {
-        <T as VecCollectionMut<E>>::get_value_mut(self, key)
+    fn get_value_mut(&mut self, value: &E) -> Option<&mut Self::Value> {
+        <T as VecCollectionMut<E>>::get_value_mut(self, value)
     }
 
     #[inline]
@@ -167,8 +279,8 @@ where
     }
 
     #[inline]
-    fn get_value_mut(&mut self, key: &E) -> Option<&mut Self::Value> {
-        self.iter_mut().find(|x| Equivalent::equivalent(key, *x))
+    fn get_value_mut(&mut self, value: &E) -> Option<&mut Self::Value> {
+        self.iter_mut().find(|x| Equivalent::equivalent(value, *x))
     }
 
     #[inline]
@@ -254,8 +366,8 @@ where
     }
 
     #[inline]
-    fn get_value_mut(&mut self, key: &E) -> Option<&mut Self::Value> {
-        self.iter_mut().find(|x| Equivalent::equivalent(key, *x))
+    fn get_value_mut(&mut self, value: &E) -> Option<&mut Self::Value> {
+        self.iter_mut().find(|x| Equivalent::equivalent(value, *x))
     }
 
     #[inline]
@@ -282,7 +394,7 @@ where
 
     #[inline]
     fn collection_as_mut_slice(&mut self) -> Option<&mut [Self::Value]> {
-        None
+        Some(self.make_contiguous())
     }
 
     #[inline]
@@ -349,8 +461,8 @@ where
     }
 
     #[inline]
-    fn get_value_mut(&mut self, key: &E) -> Option<&mut Self::Value> {
-        self.iter_mut().find(|x| Equivalent::equivalent(key, *x))
+    fn get_value_mut(&mut self, value: &E) -> Option<&mut Self::Value> {
+        self.iter_mut().find(|x| Equivalent::equivalent(value, *x))
     }
 
     #[inline]
@@ -425,8 +537,8 @@ where
     }
 
     #[inline]
-    fn get_value_mut(&mut self, key: &E) -> Option<&mut Self::Value> {
-        self.iter_mut().find(|x| Equivalent::equivalent(key, *x))
+    fn get_value_mut(&mut self, value: &E) -> Option<&mut Self::Value> {
+        self.iter_mut().find(|x| Equivalent::equivalent(value, *x))
     }
 
     #[inline]

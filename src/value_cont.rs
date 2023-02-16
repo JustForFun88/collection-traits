@@ -279,7 +279,7 @@ where
     /// assert_eq!(get_value(&arr, &"1".to_string()), Some(&"1".to_owned()));
     /// assert_eq!(get_value_borrow_value(&arr, &"5".to_string()), Some(&"5".to_owned()));
     /// assert_eq!(get_value_borrow_value(&arr, "8"), Some(&"8".to_owned()));
-    /// ```    
+    /// ```
     fn get_value(&self, value: &E) -> Option<&Self::Value>;
 
     /// Returns a converted value of the collection, if any, that is
