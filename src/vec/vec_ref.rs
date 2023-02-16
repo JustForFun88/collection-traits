@@ -14,11 +14,10 @@ use std::collections;
 /// of the  lookup value. For greater flexibility, there are no restrictions
 /// on the type of search value, but one of two conditions must be met:
 ///
-/// 1. If it is possible to implement it, then it is desirable to specify
-///    the condition `E: Equivalent<Self::Value>`.
-/// 2. If the first condition cannot be met (e.g. for [`std::collections::HashSet`]),
-///    the value **must be** any borrowed form of the container's value type (i.e.
-///    `Self::Value: Borrow<E>` ) .
+/// 1. If it is possible to implement it, then it is desirable to specify the
+///    condition `E: Equivalent<Self::Value>`.
+/// 2. If the first condition cannot be met, the value **must be** any borrowed
+///    form of the container's value type (i.e. `Self::Value: Borrow<E>` ) .
 ///
 /// Note that a container that implements `E: Equivalent<Self::Value>` will also
 /// accept all `E` lookup values such as `Self::Value: Borrow<E>`, but the reverse
@@ -34,14 +33,12 @@ where
     /// The implementation of the method depends on the container type,
     /// so it can take as `O(1)` so as `O(log n)` time.
     ///
-    /// Time: O(log n)
-    ///
     /// # Examples
     ///
     /// ```
     /// use collection_traits::VecCollectionRef;
     /// let vec = vec!["Joe", "Mike", "Robert"];
-    /// // Unfortunately, when calling the `ValueCollectionRef` methods directly,
+    /// // Unfortunately, when calling the `VecCollectionRef` methods directly,
     /// // you need to specify the type `E` because the compiler can't infer it.
     /// assert_eq!(
     ///     Some(&"Robert"),
@@ -60,30 +57,35 @@ where
     /// assert_eq!(None, get_at(&vec, 5));
     /// ```
     fn get_value_at(&self, index: usize) -> Option<&Self::Value>;
+
+    /// Extracts a slice containing the entire vector. This method does not
+    /// exist for some container types, so [`Option`] is returned.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use collection_traits::VecCollectionRef;
+    /// use std::collections::VecDeque;
+    ///
+    /// let vec = vec!["Joe", "Mike", "Robert"];
+    /// // Unfortunately, when calling the `VecCollectionRef` methods directly,
+    /// // you need to specify the type `E` because the compiler can't infer it.
+    /// assert_eq!(
+    ///     &["Joe", "Mike", "Robert"],
+    ///     VecCollectionRef::<str>::collection_as_slice(&vec).unwrap()
+    /// );
+    ///
+    /// // But you do not need to specify the type E when using VecCollectionRef
+    /// // as trait bound
+    /// fn as_slice<T: VecCollectionRef>(collection: &T) -> Option<&[T::Value]> {
+    ///     collection.collection_as_slice()
+    /// }
+    /// assert_eq!(&["Joe", "Mike", "Robert"], as_slice(&vec).unwrap());
+    ///
+    /// let vec = VecDeque::from(["Joe", "Mike", "Robert"]);
+    /// assert_eq!(None, as_slice(&vec));
+    /// ```
     fn collection_as_slice(&self) -> Option<&[Self::Value]>;
-}
-
-#[test]
-fn test() {
-    use crate::VecCollectionRef;
-    let vec = vec!["Joe", "Mike", "Robert"];
-    // Unfortunately, when calling the `ValueCollectionRef` methods directly,
-    // you need to specify the type `E` because the compiler can't infer it.
-    assert_eq!(
-        Some(&"Robert"),
-        VecCollectionRef::<str>::get_value_at(&vec, 2)
-    );
-
-    // But you do not need to specify the type E when using VecCollectionRef
-    // as trait bound
-    fn get_at<T>(collection: &T, index: usize) -> Option<&T::Value>
-    where
-        T: VecCollectionRef,
-    {
-        collection.get_value_at(index)
-    }
-    assert_eq!(Some(&"Robert"), get_at(&vec, 2));
-    assert_eq!(None, get_at(&vec, 5));
 }
 
 impl<T, E: ?Sized> VecCollectionRef<E> for &T
